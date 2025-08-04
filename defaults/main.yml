@@ -9,10 +9,13 @@ etcd_package_checksum_url: "{{ etcd_package_mirror }}/{{ etcd_version }}/SHA256S
 etcd_package_dir: "/opt/etcd"
 
 etcd_data_dir: "/var/lib/etcd/default"
-etcd_conf_dir: "/etc/etcd"
+etcd_config_dir: "/etc/etcd"
 
-etcd_service_user: "root"
-etcd_service_group: "root"
+etcd_service_user: "etcd"
+etcd_service_group: "etcd"
+etcd_service_user_shell: "/bin/false"
+etcd_service_user_system: true
 etcd_service_name: "etcd"
 
 etcd_hide_secrets: true
+etcd_secure: true

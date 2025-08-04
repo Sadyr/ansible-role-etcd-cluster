@@ -1,0 +1,20 @@
+---
+- name: Ensure etcd_service_group is present
+  become: true
+  become_user: root
+  ansible.builtin.group:
+    name: "{{ etcd_service_group }}"
+    state: present
+  when:
+  - etcd_service_group != 'root'
+- name: Ensure etcd_service_user is present
+  become: true
+  become_user:
+  ansible.builtin.user:
+    name: "{{ etcd_service_user }}"
+    group: "{{ etcd_service_group }}"
+    home: "{{ etcd_data_dir }}"
+    state: present
+    shell: "{{ etcd_service_user_shell }}"
+    system: "{{ etcd_service_user_system }}"
+    

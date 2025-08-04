@@ -1,0 +1,38 @@
+---
+- name: Ensure etcd config directory is present
+  ansible.builtin.file:
+    state: directory
+    mode: "0644"
+    path: "{{ etcd_config_dir }}"
+    owner: "{{ etcd_service_user }}"
+    group: "{{ etcd_service_group }}"
+
+- name: Ensure etcd data directory is present
+  ansible.builtin.file:
+    state: directory
+    mode: "0644"
+    path: "{{ etcd_data_dir }}"
+    owner: "{{ etcd_service_user }}"
+    group: "{{ etcd_service_group }}"
+
+- name: Deploy etcd service config file
+  anaible.builtin.template:
+    src: etcd.conf.j2
+    dest: "{{ etcd_config_dir }}/etcd.conf"
+    owner:  "{{ etcd_service_user }}"
+    group: "{{ etcd_service_group }}"
+    mode: "0644"
+  notify:
+    - Restart etcd
+
+- name: Deploy etcd systemd unit config file
+  ansible.builtin.template:
+    src: etcd.service.j2
+    dest: "/etc/systemd/system/{{ etcd_service_name }}.service"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify:
+    - Reload systemd
+
+

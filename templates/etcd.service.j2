@@ -1,0 +1,53 @@
+[Unit]
+Description=Etcd Server
+After=network.target
+
+[Service]
+Type=notify
+User={{etcd_user}}
+WorkingDirectory={{etcd_data_dir}}/
+EnvironmentFile=-/etc/etcd/etcd.conf
+# set GOMAXPROCS to number of processors
+ExecStart=/bin/bash -c "GOMAXPROCS=$(nproc) {{etcd_install_dir}}/etcd"
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
+
+
+PART 2
+#jinja2: trim_blocks:False
+{%- if not etcd_settings['discovery-srv'] %}
+{%- macro cluster_hosts() -%}
+{%- for host in groups[etcd_ansible_group] -%}
+{{ hostvars[host]['ansible_hostname'] }}=https://{{ hostvars[host]['ansible_' + etcd_interface].ipv4.address }}:{{ etcd_peer_port }}{% if not loop.last %},{% endif %}
+{%- endfor -%} 
+{%- endmacro -%}
+{%- set etcd_settings = etcd_settings | combine({'initial-cluster': cluster_hosts()}) -%}
+{%- set etcd_settings = etcd_settings | dict2items | rejectattr('key', 'equalto', 'discovery-srv') | items2dict -%}
+{%- endif %}
+[Unit]
+Description=etcd
+Documentation=https://github.com/etcd-io/etcd/
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+{%- for setting in etcd_service_options %}
+{{ setting }}
+{%- endfor %}
+{% if etcd_allow_unsupported_archs %}
+Environment=ETCD_UNSUPPORTED_ARCH={{ etcd_architecture }}
+{% endif %}
+ExecStart={{ etcd_bin_dir }}/etcd \
+{%- for setting in etcd_settings|sort %}
+  --{{ setting }}="{{ etcd_settings[setting] }}" {% if not loop.last %}\{% endif %}
+{%- endfor %}
+Restart=on-failure
+RestartSec=5
+Type=notify
+
+[Install]
+WantedBy=multi-user.target
+
