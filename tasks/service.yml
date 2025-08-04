@@ -1,0 +1,5 @@
+---
+- name: Create etcd user
+- name: Create etcd group
+- name: Setup etcd conf
+- name: Setup etcd systemd conf

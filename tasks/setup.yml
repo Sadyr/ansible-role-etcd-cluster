@@ -1,0 +1,56 @@
+---
+- name: Ensure etcd download directory is exist
+  ansible.builtin.file:
+    state: directory
+    mode: 0755
+    path: "{{ etcd_package_dir }}"
+    owner: "{{ etcd_service_user }}"
+    group: "{{ etcd_service_group }}"
+
+- name: Check if etcd package is downloaded
+  ansible.builtin.stat:
+    path: "{{ etcd_package_dir }}/{{ etcd_package_filename }}" 
+  register: __etcd_package_file
+
+- name: Handle when etcd package not downloaded
+  block:
+  - name: Define variable with list of checksums for etcd packages
+    set_fact:
+      __checksum_list: "{{ query<F5>('ansible.builtin.url',etcd_package_checksum_url ) }}"
+  - name: Define variable with checksum for the etcd package
+    ansible.builtin.set_fact:
+      __etcd_package_checksum: "{{ item.split('  ')[0] }}"
+    when: 
+    - etcd_package_filename == item.split('  ')[1] 
+    loop: "{{ __checksum_list }}"
+    no_log: "{{ etcd_hide_secrets }}"
+  - name: Ensure etcd package is downloaded
+    ansible.builtin.get_url:
+      url: "{{ etcd_package_url }}"
+      dest: "{{ etcd_package_dir }}"
+      checksum: "sha256:{{ __etcd_package_checksum }}"
+      mode: "0755"
+      timeout: 30
+  when: not __etcd_package_file.stat.exists
+
+- name: Ensure etcd package is unarchived
+  ansible.builtin.unarchive:
+    src: "{{ etcd_package_dir }}/{{ etcd_package_filename }}"
+    dest: "{{ etcd_package_dir }}"
+    remote_src: true
+    owner: "root"
+    group: root
+    creates: "{{ etcd_package_dir }}/etcd-{{ etcd_version }}-linux-{{ etcd_architecture }}/etcd"
+
+- name:  Ensure etcd binaries copied to binary directory
+  ansible.builtin.copy:
+    src: "{{ etcd_package_dir }}/etcd-{{ etcd_version }}-linux-{{ etcd_architecture }}/{{ item }}"
+    dest: "{{ etcd_bin_dir }}/{{ item }}"
+    mode: "0755"
+    owner: "root"
+    group: "root"
+    remote_src: true
+  loop:
+  - etcd
+  - etcdctl
+  - etcdutl

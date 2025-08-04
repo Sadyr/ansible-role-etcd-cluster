@@ -1,0 +1,18 @@
+---
+etcd_version: "v3.6.4"
+etcd_architecture: "amd64"
+
+etcd_package_mirror: "https://github.com/etcd-io/etcd/releases/download"
+etcd_package_filename: "etcd-{{ etcd_version }}-linux-{{ etcd_architecture }}.tar.gz"
+etcd_package_url: "{{ etcd_package_mirror }}/{{ etcd_version }}/{{ etcd_package_filename }}"
+etcd_package_checksum_url: "{{ etcd_package_mirror }}/{{ etcd_version }}/SHA256SUMS"
+etcd_package_dir: "/opt/etcd"
+
+etcd_data_dir: "/var/lib/etcd/default"
+etcd_conf_dir: "/etc/etcd"
+
+etcd_service_user: "root"
+etcd_service_group: "root"
+etcd_service_name: "etcd"
+
+etcd_hide_secrets: true
