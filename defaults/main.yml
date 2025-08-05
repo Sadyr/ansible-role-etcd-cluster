@@ -19,3 +19,18 @@ etcd_service_name: "etcd"
 
 etcd_hide_secrets: true
 etcd_secure: true
+
+etcd_setup_type: cluster
+etcd_initial_cluster: []
+etcd_member_name: "{{ ansible_fqdn }}"
+etcd_hearbeat_interval: 100
+etcd_election_timeout: 1000
+etcd_connection_scheme: http
+etcd_peer_port: 2380
+etcd_client_port: 2379
+etcd_peer_listen_addresses: []
+etcd_peer_listen_urls: []
+etcd_initial_advertise_peer_urls: []
+etcd_initial-cluster-state: new
+etcd_initial_cluster_token: "etcd-cluster"
+

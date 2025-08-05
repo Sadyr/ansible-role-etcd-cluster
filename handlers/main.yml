@@ -1,4 +1,14 @@
 ---
 - name: Reload etcd
+  ansible.builtin.systemd_service:
+    name: "{{ etcd_service_name }}"
+    state: reloaded
+
 - name: Reload systemd
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+
 - name: Restart etcd
+  ansible.builtin.systemd_service:
+    name: "{{ etcd_service_name }}"
+    state: restarted
