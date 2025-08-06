@@ -13,8 +13,9 @@
   ansible.builtin.user:
     name: "{{ etcd_service_user }}"
     group: "{{ etcd_service_group }}"
-    home: "{{ etcd_data_dir }}"
     state: present
+    create_home: false
     shell: "{{ etcd_service_user_shell }}"
     system: "{{ etcd_service_user_system }}"
-    
+  when:
+  - etcd_service_group != 'root'

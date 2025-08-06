@@ -1,0 +1,10 @@
+---
+- name: Allow connection in ports
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    state: enabled
+    permanent: true
+    immediate: true
+  loop:
+  - 2379/tcp
+  - 2380/tcp

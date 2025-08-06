@@ -8,31 +8,50 @@ etcd_package_url: "{{ etcd_package_mirror }}/{{ etcd_version }}/{{ etcd_package_
 etcd_package_checksum_url: "{{ etcd_package_mirror }}/{{ etcd_version }}/SHA256SUMS"
 etcd_package_dir: "/opt/etcd"
 
-etcd_data_dir: "/var/lib/etcd/default"
 etcd_config_dir: "/etc/etcd"
 
 etcd_service_user: "etcd"
 etcd_service_group: "etcd"
-etcd_service_user_shell: "/bin/false"
+etcd_service_user_shell: "/sbin/nologin"
 etcd_service_user_system: true
 etcd_service_name: "etcd"
 
-etcd_hide_secrets: true
+etcd_hide_secrets: false
+
 etcd_secure: false
+etcd_setup_type: cluster
+etcd_cluster_setup_method: static
 
-etcd_setup_type: single
-etcd_member_name: "{{ ansible_fqdn }}"
+etcd_peer_conn_scheme: http
+etcd_peer_port: 2380
+etcd_peer_listen_urls:
+- "{{ etcd_peer_conn_scheme }}://127.0.0.1:{{ etcd_peer_port }}"
+- "{{ etcd_peer_conn_scheme }}://{{ int_api_ip }}:{{ etcd_peer_port }}"
+etcd_peer_advertise_urls:
+- "{{ etcd_peer_conn_scheme }}://{{ int_api_ip }}:{{ etcd_peer_port }}"
+- "{{ etcd_peer_conn_scheme }}://{{ ansible_fqdn }}:{{ etcd_client_port }}"
 
-etcd_initial_cluster: []
+
+etcd_client_port: 2379
+etcd_client_conn_scheme: http
+etcd_client_listen_urls:
+- "{{ etcd_client_conn_scheme }}://127.0.0.1:{{ etcd_client_port }}"
+- "{{ etcd_client_conn_scheme }}://{{ ext_api_ip }}:{{ etcd_client_port }}"
+etcd_client_advertise_urls:
+- "{{ etcd_client_conn_scheme }}://{{ ext_api_ip }}:{{ etcd_client_port }}"
+- "{{ etcd_client_conn_scheme }}://{{ ansible_fqdn }}:{{ etcd_client_port }}"
+
+
+etcd_name: "{{ ansible_hostname }}"
+etcd_data_dir: "/var/lib/etcd/"
 etcd_hearbeat_interval: 100
 etcd_election_timeout: 1000
-etcd_connection_scheme: http
-etcd_peer_port: 2380
-etcd_client_port: 2379
 
-etcd_peer_listen_addresses: []
-etcd_peer_listen_urls: []
-etcd_initial_advertise_peer_urls: []
-etcd_initial-cluster-state: new
-etcd_initial_cluster_token: "etcd-cluster"
+etcd_cluster_token: cluster_for_patroni
+etcd_cluster_state: new
+etcd_cluster_initial_members:
+- "etcd01=http://10.10.0.17:2380"
+- "etcd02=http://10.10.0.18:2380"
+- "etcd03=http://10.10.0.19:2380"
+
 

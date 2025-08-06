@@ -1,22 +1,16 @@
 # [member]
-name: {{ etcd_member_name }}
-data_dir: {{ etcd_data_dir }}
-snapshot-count: "10000"
+name: {{ etcd_name }}
+data-dir: {{ etcd_data_dir }}
 heartbeat-interval: {{ etcd_hearbeat_interval }}
 election-timeout: {{ etcd_election_timeout }}
-listen-peer-urls: {{ etcd_listen_peer_urls }}
-listen-client-urls: {{ etcd_listen_client_urls }}
-max-snapshots: 5
+listen-peer-urls: {{ etcd_peer_listen_urls | join(",") }}
+listen-client-urls: {{ etcd_client_listen_urls | join(",") }}
 
 # [cluster]
-#initial-advertise-peer-urls: {{ etcd_initial_advertise_peer_urls }}
-#initial-cluster: {{ etcd_initial_cluster }}
-#initial-cluster-token: {{ etcd_initial_cluster_token }}
-#advertise-client-urls: {{ etcd_advertise_client_urls }}
-#discovery: {{ etcd_discovery }}
+initial-advertise-peer-urls: {{ etcd_peer_advertise_urls | join(",") }}
+initial-cluster: {{ etcd_cluster_initial_members | join(",") }}
+initial-cluster-token: {{ etcd_cluster_token }}
+advertise-client-urls: {{ etcd_client_advertise_urls | join(",") }}
+initial-cluster-state: {{ etcd_cluster_state }}
 
-# [proxy]
-# [security]
-# [logging]
-# [auth]
 

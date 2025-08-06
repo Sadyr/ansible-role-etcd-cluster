@@ -1,5 +1,5 @@
 ---
-- name: Ensure etcd download directory is exist
+- name: Ensure etcd package directory is exist
   ansible.builtin.file:
     state: directory
     mode: 0755
@@ -16,7 +16,7 @@
   block:
   - name: Define variable with list of checksums for etcd packages
     set_fact:
-      __checksum_list: "{{ query<F5>('ansible.builtin.url',etcd_package_checksum_url ) }}"
+      __checksum_list: "{{ query('ansible.builtin.url',etcd_package_checksum_url ) }}"
   - name: Define variable with checksum for the etcd package
     ansible.builtin.set_fact:
       __etcd_package_checksum: "{{ item.split('  ')[0] }}"
